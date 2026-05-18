@@ -1,0 +1,297 @@
+// ============================================================
+// schema.prisma — Goukies API
+// Convertido de SQL a Prisma con snake_case y nombres limpios
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["user_schema", "receta"]
+}
+
+// ============================================================
+// SCHEMA: user_schema (antes "userSchema")
+// ============================================================
+
+model Moneda {
+  codigo String @id @db.Char(3)
+  nombre String @db.VarChar(30)
+
+  usuarios Usuario[]
+
+  @@map("moneda")
+  @@schema("user_schema")
+}
+
+model Usuario {
+  id              String  @id @default(uuid()) @db.Uuid
+  nombre          String  @db.VarChar(30)
+  correo_electronico String @unique @db.VarChar(100)
+  contrasena_hash String  @db.VarChar(100)
+  moneda_codigo   String  @default("MXN") @db.Char(3)
+
+  moneda     Moneda    @relation(fields: [moneda_codigo], references: [codigo])
+  productos  Producto[]
+  recetas    Receta[]
+  insumos    Insumo[]
+
+  @@map("usuario")
+  @@schema("user_schema")
+}
+
+model Proveedor {
+  id          String @id @default(uuid()) @db.Uuid
+  nombre      String @db.VarChar(30)
+  num_celular String @db.VarChar(15)
+
+  entradas           Entrada[]
+  producto_proveedor ProductoProveedor[]
+
+  @@map("proveedor")
+  @@schema("user_schema")
+}
+
+// ============================================================
+// SCHEMA: receta
+// ============================================================
+
+model Unidad {
+  id              Int    @id
+  nombre          String @db.VarChar(30)
+  cantidad_gramos Int?
+
+  productos Producto[]
+  insumos   Insumo[]
+
+  @@map("unidad")
+  @@schema("receta")
+}
+
+model Ingrediente {
+  id     Int    @id
+  nombre String @db.VarChar(50)
+
+  productos Producto[]
+
+  @@map("ingrediente")
+  @@schema("receta")
+}
+
+model Marca {
+  id     Int    @id
+  nombre String @db.VarChar(30)
+
+  productos Producto[]
+
+  @@map("marca")
+  @@schema("receta")
+}
+
+model Tag {
+  id     Int    @id
+  nombre String @db.VarChar(30)
+
+  tags_receta TagReceta[]
+
+  @@map("tags")
+  @@schema("receta")
+}
+
+model Tipo {
+  id     Int    @id
+  nombre String @db.VarChar(50)
+
+  productos Producto[]
+
+  @@map("tipo")
+  @@schema("receta")
+}
+
+model Producto {
+  id                  String  @id @default(uuid()) @db.Uuid
+  id_ingrediente      Int
+  id_marca            Int
+  id_unidad           Int
+  pzas                Int?
+  precio_medio        Decimal @db.Decimal(10, 2)
+  cantidad_inventario Int
+  cantidad_unitario   Int
+  id_tipo             Int
+  id_usuario          String  @db.Uuid
+
+  ingrediente        Ingrediente         @relation(fields: [id_ingrediente], references: [id])
+  marca              Marca               @relation(fields: [id_marca], references: [id])
+  unidad             Unidad              @relation(fields: [id_unidad], references: [id])
+  tipo               Tipo                @relation(fields: [id_tipo], references: [id])
+  usuario            Usuario             @relation(fields: [id_usuario], references: [id])
+  producto_proveedor ProductoProveedor[]
+  receta_producto    RecetaProducto[]
+  detalle_entrada    DetalleEntrada[]
+  detalle_salida     DetalleSalida[]
+
+  @@map("producto")
+  @@schema("receta")
+}
+
+model Receta {
+  id               String    @id @default(uuid()) @db.Uuid
+  profit           Decimal   @db.Decimal(10, 2)
+  nombre           String    @db.VarChar(30)
+  porciones_totales Int
+  imagen_url       String?   @db.VarChar(300)
+  fecha_creacion   DateTime  @default(now())
+  fecha_modificacion DateTime?
+  id_usuario       String    @db.Uuid
+
+  usuario         Usuario          @relation(fields: [id_usuario], references: [id])
+  tags_receta     TagReceta[]
+  receta_producto RecetaProducto[]
+  receta_insumo   RecetaInsumo[]
+  receta_pasos    RecetaPaso[]
+  salidas         Salida[]
+
+  @@map("receta")
+  @@schema("receta")
+}
+
+model Insumo {
+  id              String  @id @default(uuid()) @db.Uuid
+  nombre          String  @db.VarChar(50)
+  precio_unitario Decimal @db.Decimal(10, 2)
+  id_unidad       Int
+  id_usuario      String  @db.Uuid
+
+  unidad        Unidad         @relation(fields: [id_unidad], references: [id])
+  usuario       Usuario        @relation(fields: [id_usuario], references: [id])
+  receta_insumo RecetaInsumo[]
+
+  @@map("insumo")
+  @@schema("receta")
+}
+
+// ── Tablas intermedias (muchos a muchos) ──────────────────────
+
+model TagReceta {
+  id_receta String @map("id_receta") @db.Uuid
+  id_tag    Int    @map("id_tags")
+
+  receta Receta @relation(fields: [id_receta], references: [id])
+  tag    Tag    @relation(fields: [id_tag], references: [id])
+
+  @@id([id_receta, id_tag])
+  @@map("tags_receta")
+  @@schema("receta")
+}
+
+model ProductoProveedor {
+  id_proveedor String  @map("id_proveedor") @db.Uuid
+  id_producto  String  @map("id_producto") @db.Uuid
+  precio       Decimal @db.Decimal(10, 2)
+
+  proveedor Proveedor @relation(fields: [id_proveedor], references: [id])
+  producto  Producto  @relation(fields: [id_producto], references: [id])
+
+  @@id([id_proveedor, id_producto])
+  @@map("producto_proveedor")
+  @@schema("receta")
+}
+
+model RecetaProducto {
+  id_receta      String   @map("id_receta") @db.Uuid
+  id_producto    String   @map("id_producto") @db.Uuid
+  cantidad       Decimal  @db.Decimal(10, 2)
+  fecha_creacion DateTime @default(now())
+
+  receta  Receta  @relation(fields: [id_receta], references: [id])
+  producto Producto @relation(fields: [id_producto], references: [id])
+
+  @@id([id_receta, id_producto])
+  @@map("receta_producto")
+  @@schema("receta")
+}
+
+model RecetaInsumo {
+  id_receta  String  @map("id_receta") @db.Uuid
+  id_insumo  String  @map("id_insumo") @db.Uuid
+  cantidad   Decimal @db.Decimal(10, 2)
+
+  receta Receta @relation(fields: [id_receta], references: [id])
+  insumo Insumo @relation(fields: [id_insumo], references: [id])
+
+  @@id([id_receta, id_insumo])
+  @@map("receta_insumo")
+  @@schema("receta")
+}
+
+model RecetaPaso {
+  id        Int    @id
+  id_receta String @map("id_receta") @db.Uuid
+  paso      String? @db.VarChar(300)
+  orden     Int
+
+  receta Receta @relation(fields: [id_receta], references: [id])
+
+  @@map("receta_pasos")
+  @@schema("receta")
+}
+
+// ── Entradas y Salidas (inventario) ──────────────────────────
+
+model Entrada {
+  id           String   @id @default(uuid()) @db.Uuid
+  fecha        DateTime @db.Date
+  estado       Boolean
+  total        Decimal  @db.Decimal(10, 2)
+  id_proveedor String   @map("id_proveedor") @db.Uuid
+
+  proveedor       Proveedor        @relation(fields: [id_proveedor], references: [id])
+  detalle_entrada DetalleEntrada[]
+
+  @@map("entrada")
+  @@schema("receta")
+}
+
+model DetalleEntrada {
+  id          Int     @id
+  id_producto String  @map("id_producto") @db.Uuid
+  id_entrada  String  @map("id_entrada") @db.Uuid
+  precio      Decimal @db.Decimal(10, 2)
+  cantidad    Decimal @db.Decimal(10, 2)
+
+  producto Producto @relation(fields: [id_producto], references: [id])
+  entrada  Entrada  @relation(fields: [id_entrada], references: [id])
+
+  @@map("detalle_entrada")
+  @@schema("receta")
+}
+
+model Salida {
+  id        String   @id @default(uuid()) @db.Uuid
+  fecha     DateTime @db.Date
+  estado    Boolean
+  total     Decimal  @db.Decimal(10, 2)
+  id_receta String   @map("id_receta") @db.Uuid
+
+  receta         Receta          @relation(fields: [id_receta], references: [id])
+  detalle_salida DetalleSalida[]
+
+  @@map("salida")
+  @@schema("receta")
+}
+
+model DetalleSalida {
+  id          Int    @id
+  id_salida   String @map("id_salida") @db.Uuid
+  id_producto String @map("id_producto") @db.Uuid
+  cantidad    Int
+
+  salida   Salida   @relation(fields: [id_salida], references: [id])
+  producto Producto @relation(fields: [id_producto], references: [id])
+
+  @@map("detalle_salida")
+  @@schema("receta")
+}
