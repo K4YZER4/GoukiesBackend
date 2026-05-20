@@ -144,7 +144,7 @@ model Receta {
   porciones_totales Int
   imagen_url       String?   @db.VarChar(300)
   fecha_creacion   DateTime  @default(now())
-  fecha_modificacion DateTime?
+  fecha_modificacion DateTime @updatedAt
   id_usuario       String    @db.Uuid
 
   usuario         Usuario          @relation(fields: [id_usuario], references: [id])
