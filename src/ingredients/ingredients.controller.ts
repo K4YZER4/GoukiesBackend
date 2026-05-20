@@ -1,4 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Post, Body } from "@nestjs/common";
+import { IngredientsService } from "./ingredients.service";
 
-@Controller('ingredients')
-export class IngredientsController {}
+@Controller("ingredients")
+export class IngredientsController {
+  constructor(private readonly ingredientsService: IngredientsService) {}
+
+  @Post("create")
+  create(@Body() dto: any) {
+    return this.ingredientsService.create(dto);
+  }
+}

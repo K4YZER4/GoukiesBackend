@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { IngredientsController } from './ingredients.controller';
-import { IngredientsService } from './ingredients.service';
-
+import { Module } from "@nestjs/common";
+import { IngredientsController } from "./ingredients.controller";
+import { IngredientsService } from "./ingredients.service";
+import { PrismaService } from "../prisma/prisma.service";
 @Module({
   controllers: [IngredientsController],
-  providers: [IngredientsService]
+  providers: [IngredientsService, PrismaService],
 })
 export class IngredientsModule {}
