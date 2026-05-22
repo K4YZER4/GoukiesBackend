@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Registro Goukies</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <form id="register-form" class="card">
+        <h2>Registrar usuario</h2>
+
+        <label for="nombre">Nombre de usuario</label>
+        <input id="nombre" type="text" required />
+
+        <label for="correo">Correo electrónico</label>
+        <input id="correo" type="email" required />
+
+        <label for="password">Contraseña</label>
+        <input id="password" type="password" required />
+
+        <label for="moneda">Código de moneda</label>
+        <input id="moneda" type="text" value="MXN" required />
+
+        <button type="submit">Crear cuenta</button>
+
+        <p id="mensaje"></p>
+
+        <a href="index.html" class="link">Volver al menú</a>
+      </form>
+    </div>
+
+    <script src="register.js"></script>
+  </body>
+</html>

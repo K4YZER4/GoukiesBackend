@@ -6,7 +6,9 @@ import { NotFoundException, ConflictException } from "@nestjs/common/exceptions"
 @Injectable()
 export class RecipesService {
   constructor(private readonly prisma: PrismaService) {}
-
+  async selectAll() {
+    return this.prisma.db.receta.findMany();
+  }
   async create(dto: createRecipeDto) {
     try {
       const receta = await this.prisma.db.receta.create({

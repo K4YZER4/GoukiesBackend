@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from "@nestjs/common";
+import { Controller, Post, Body, Get } from "@nestjs/common";
 import { IngredientsService } from "./ingredients.service";
 
 @Controller("ingredients")
@@ -8,5 +8,10 @@ export class IngredientsController {
   @Post("create")
   create(@Body() dto: any) {
     return this.ingredientsService.create(dto);
+  }
+
+  @Get("obtain-all")
+  selectAll() {
+    return this.ingredientsService.selectAll();
   }
 }

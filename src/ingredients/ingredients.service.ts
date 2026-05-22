@@ -12,6 +12,9 @@ import { Logger } from "@nestjs/common";
 export class IngredientsService {
   constructor(private readonly prisma: PrismaService) {}
   private readonly logger = new Logger(IngredientsService.name);
+  async selectAll() {
+    return this.prisma.db.producto.findMany();
+  }
   async create(dto: CreateIngredientDto) {
     try {
       const nuevoIngrediente = await this.prisma.db.producto.create({
