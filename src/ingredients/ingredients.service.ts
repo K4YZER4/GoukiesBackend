@@ -6,12 +6,19 @@ import {
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
-import { CreateIngredientDto } from "./dto/createIngredient";
+import { CreateIngredientDto } from "./dto/createIngredient.dto";
+import { DeleteIngredientDto } from "./dto/deleteIngredien.dto";
 import { Logger } from "@nestjs/common";
+import { deleteRecipeDto } from "../recipes/dto/deleteRecipe.dto";
 @Injectable()
 export class IngredientsService {
   constructor(private readonly prisma: PrismaService) {}
   private readonly logger = new Logger(IngredientsService.name);
+  async delete(dto: DeleteIngredientDto) {
+    await this.prisma.db.producto.delete({
+      where: { id: dto.id },
+    });
+  }
   async selectAll() {
     return this.prisma.db.producto.findMany();
   }

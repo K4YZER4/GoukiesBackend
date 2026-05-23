@@ -1,9 +1,15 @@
 import { PrismaService } from "../prisma/prisma.service";
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/createUser";
+import { deleteUserDto } from "./dto/deleteUser.dto";
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
+  async delete(dto: deleteUserDto) {
+    await this.prisma.db.usuario.delete({
+      where: { id: dto.id },
+    });
+  }
   async create(dto: CreateUserDto) {
     const existeCorreo = await this.prisma.db.usuario.findFirst({
       where: { correo_electronico: dto.correo_electronico },
