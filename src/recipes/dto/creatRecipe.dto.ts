@@ -25,4 +25,7 @@ export class createRecipeDto {
 
   @IsUUID()
   idUsuario!: string;
+
+  @IsString()
+  descripcion!: string;
 }
