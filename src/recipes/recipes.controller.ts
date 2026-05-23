@@ -1,12 +1,13 @@
-import { Controller, Post, Body, Get } from "@nestjs/common";
-import { createRecipeDto } from "./dto/creatRecipe.dto";
+import { Controller, Post, Body, Get, Param, Patch, ParseUUIDPipe } from "@nestjs/common";
+import { CreateRecipeDto } from "./dto/creatRecipe.dto";
 import { RecipesService } from "./recipes.service";
 import { deleteRecipeDto } from "./dto/deleteRecipe.dto";
+import { UpdateRecipeDto } from "./dto/updateRecipe.dto";
 @Controller("recipes")
 export class RecipesController {
   constructor(private readonly RecipesService: RecipesService) {}
   @Post("create")
-  create(@Body() dto: createRecipeDto) {
+  create(@Body() dto: CreateRecipeDto) {
     return this.RecipesService.create(dto);
   }
 
@@ -18,5 +19,10 @@ export class RecipesController {
   @Post("delete")
   delete(@Body() dto: deleteRecipeDto) {
     return this.RecipesService.delete(dto);
+  }
+
+  @Patch("update/:id")
+  update(@Param("id", ParseUUIDPipe) id: string, @Body() dto: UpdateRecipeDto) {
+    return this.RecipesService.update(id, dto);
   }
 }

@@ -1,12 +1,32 @@
 import { Injectable } from "@nestjs/common";
-import { createRecipeDto } from "./dto/creatRecipe.dto";
+import { CreateRecipeDto } from "./dto/creatRecipe.dto";
 import { PrismaService } from "../prisma/prisma.service";
 import { Prisma } from "@prisma/client";
 import { NotFoundException, ConflictException } from "@nestjs/common/exceptions";
 import { deleteRecipeDto } from "./dto/deleteRecipe.dto";
+import { UpdateRecipeDto } from "./dto/updateRecipe.dto";
 @Injectable()
 export class RecipesService {
   constructor(private readonly prisma: PrismaService) {}
+  async update(id: string, dto: UpdateRecipeDto) {
+    if (!id) {
+      throw new NotFoundException("Receta no encontrada");
+    }
+    await this.prisma.db.receta.update({
+      where: { id: id },
+      data: {
+        nombre: dto.nombre,
+        profit: dto.profit,
+        porciones_totales: dto.porcionesTotales,
+        imagen_url: dto.imagenURL,
+        fecha_modificacion: new Date(),
+        descripcion: dto.descripcion,
+      },
+    });
+    return {
+      message: "Receta actualizada correctamente",
+    };
+  }
   async delete(dto: deleteRecipeDto) {
     if (!dto.id) {
       throw new NotFoundException("Receta no encontrada");
@@ -18,7 +38,7 @@ export class RecipesService {
   async selectAll() {
     return this.prisma.db.receta.findMany();
   }
-  async create(dto: createRecipeDto) {
+  async create(dto: CreateRecipeDto) {
     try {
       const receta = await this.prisma.db.receta.create({
         data: {

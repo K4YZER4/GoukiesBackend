@@ -8,7 +8,7 @@ import { IsString, MinLength, IsUrl, IsOptional, IsNumber, IsUUID } from "class-
   "fechaCreacion" TIMESTAMP [not null, default: `NOW()`]
   "fechaModificacion" TIMESTAMP
   "idUsuario" UUID [not null]^*/
-export class createRecipeDto {
+export class CreateRecipeDto {
   @IsNumber()
   profit!: number;
 
