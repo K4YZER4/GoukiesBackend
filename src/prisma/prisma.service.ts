@@ -4,7 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
-  private client: PrismaClient;
+  private readonly client: PrismaClient;
 
   constructor() {
     const adapter = new PrismaPg({

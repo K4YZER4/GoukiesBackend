@@ -9,7 +9,6 @@ import { PrismaService } from "../prisma/prisma.service";
 import { CreateIngredientDto } from "./dto/createIngredient.dto";
 import { DeleteIngredientDto } from "./dto/deleteIngredien.dto";
 import { Logger } from "@nestjs/common";
-import { deleteRecipeDto } from "../recipes/dto/deleteRecipe.dto";
 import { UpdateIngredientDto } from "./dto/updateIngredient.dto";
 @Injectable()
 export class IngredientsService {
@@ -41,7 +40,7 @@ export class IngredientsService {
     };
   }
   async selectAll() {
-    return this.prisma.db.producto.findMany();
+    return this.prisma.db.vistaProducto.findMany();
   }
   async create(dto: CreateIngredientDto) {
     try {

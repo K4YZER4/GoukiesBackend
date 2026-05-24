@@ -296,3 +296,20 @@ model DetalleSalida {
   @@map("detalle_salida")
   @@schema("receta")
 }
+
+///Vistas
+
+model VistaProducto {
+  id                    String  @id
+  ingrediente           String
+  marca                 String
+  tipo                  String
+  unidad                String
+  pzas                  Int
+  precio_medio          Decimal @db.Decimal(10, 2)
+  cantidad_inventario   Int
+  cantidad_unitario     Int
+
+  @@map("vista_producto")
+  @@schema("receta")
+}
