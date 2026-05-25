@@ -313,3 +313,25 @@ model VistaProducto {
   @@map("vista_producto")
   @@schema("receta")
 }
+// Vistas
+
+model VistaPasosPorReceta {
+  id_receta String
+  paso      String
+  orden     Int
+
+  @@id([id_receta, orden])
+  @@map("vista_pasos_por_receta")
+  @@schema("receta")
+}
+
+model VistaProductoReceta {
+  ingrediente_nombre String
+  marca_nombre       String
+  cantidad           Int
+  id_receta          String
+
+  @@id([id_receta, ingrediente_nombre])
+  @@map("vista_producto_receta")
+  @@schema("receta")
+}

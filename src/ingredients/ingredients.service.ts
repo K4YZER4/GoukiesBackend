@@ -40,7 +40,15 @@ export class IngredientsService {
     };
   }
   async selectAll() {
-    return this.prisma.db.vistaProducto.findMany();
+    const [producto, ingredientes, marca, tipo, unidad] = await Promise.all([
+      this.prisma.db.vistaProducto.findMany(),
+      this.prisma.db.ingrediente.findMany(),
+      this.prisma.db.marca.findMany(),
+      this.prisma.db.tipo.findMany(),
+      this.prisma.db.unidad.findMany(),
+    ]);
+
+    return { producto, ingredientes, marca, tipo, unidad };
   }
   async create(dto: CreateIngredientDto) {
     try {

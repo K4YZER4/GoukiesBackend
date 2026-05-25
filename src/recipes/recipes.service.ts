@@ -36,7 +36,16 @@ export class RecipesService {
     });
   }
   async selectAll() {
-    return this.prisma.db.receta.findMany();
+    const [recetas, pasos, ingredientes] = await Promise.all([
+      this.prisma.db.receta.findMany(),
+      this.prisma.db.vistaPasosPorReceta.findMany({ orderBy: { orden: "asc" } }),
+      this.prisma.db.vistaProductoReceta.findMany(),
+    ]);
+    return recetas.map((receta) => ({
+      ...receta,
+      pasos: pasos.filter((p) => p.id_receta === receta.id),
+      ingredientes: ingredientes.filter((i) => i.id_receta === receta.id),
+    }));
   }
   async create(dto: CreateRecipeDto) {
     try {
