@@ -7,7 +7,7 @@ CREATE SCHEMA IF NOT EXISTS "user_schema";
 -- CreateTable
 CREATE TABLE "user_schema"."moneda" (
     "codigo" CHAR(3) NOT NULL,
-    "nombre" VARCHAR(30) NOT NULL,
+    "nombre" VARCHAR(50) NOT NULL,
 
     CONSTRAINT "moneda_pkey" PRIMARY KEY ("codigo")
 );
@@ -15,7 +15,7 @@ CREATE TABLE "user_schema"."moneda" (
 -- CreateTable
 CREATE TABLE "user_schema"."usuario" (
     "id" UUID NOT NULL,
-    "nombre" VARCHAR(30) NOT NULL,
+    "nombre" VARCHAR(50) NOT NULL,
     "correo_electronico" VARCHAR(100) NOT NULL,
     "contrasena_hash" VARCHAR(100) NOT NULL,
     "moneda_codigo" CHAR(3) NOT NULL DEFAULT 'MXN',
@@ -26,7 +26,7 @@ CREATE TABLE "user_schema"."usuario" (
 -- CreateTable
 CREATE TABLE "user_schema"."proveedor" (
     "id" UUID NOT NULL,
-    "nombre" VARCHAR(30) NOT NULL,
+    "nombre" VARCHAR(50) NOT NULL,
     "num_celular" VARCHAR(15) NOT NULL,
 
     CONSTRAINT "proveedor_pkey" PRIMARY KEY ("id")
@@ -35,7 +35,7 @@ CREATE TABLE "user_schema"."proveedor" (
 -- CreateTable
 CREATE TABLE "receta"."unidad" (
     "id" INTEGER NOT NULL,
-    "nombre" VARCHAR(30) NOT NULL,
+    "nombre" VARCHAR(50) NOT NULL,
     "cantidad_gramos" INTEGER,
 
     CONSTRAINT "unidad_pkey" PRIMARY KEY ("id")
@@ -52,7 +52,7 @@ CREATE TABLE "receta"."ingrediente" (
 -- CreateTable
 CREATE TABLE "receta"."marca" (
     "id" INTEGER NOT NULL,
-    "nombre" VARCHAR(30) NOT NULL,
+    "nombre" VARCHAR(50) NOT NULL,
 
     CONSTRAINT "marca_pkey" PRIMARY KEY ("id")
 );
@@ -60,7 +60,7 @@ CREATE TABLE "receta"."marca" (
 -- CreateTable
 CREATE TABLE "receta"."tags" (
     "id" INTEGER NOT NULL,
-    "nombre" VARCHAR(30) NOT NULL,
+    "nombre" VARCHAR(50) NOT NULL,
 
     CONSTRAINT "tags_pkey" PRIMARY KEY ("id")
 );
@@ -93,7 +93,7 @@ CREATE TABLE "receta"."producto" (
 CREATE TABLE "receta"."receta" (
     "id" UUID NOT NULL,
     "profit" DECIMAL(10,2) NOT NULL,
-    "nombre" VARCHAR(30) NOT NULL,
+    "nombre" VARCHAR(50) NOT NULL,
     "porciones_totales" INTEGER NOT NULL,
     "imagen_url" VARCHAR(300),
     "fecha_creacion" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

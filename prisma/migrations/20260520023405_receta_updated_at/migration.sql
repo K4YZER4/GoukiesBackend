@@ -1,5 +1,12 @@
--- Primero llena los NULLs con la fecha actual
-UPDATE "receta"."receta" SET "fecha_modificacion" = NOW() WHERE "fecha_modificacion" IS NULL;
+CREATE OR REPLACE FUNCTION receta_set_fecha_modificacion()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.fecha_modificacion := NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
--- Luego sí lo pones NOT NULL
-ALTER TABLE "receta"."receta" ALTER COLUMN "fecha_modificacion" SET NOT NULL;
+CREATE TRIGGER receta_update_fecha_modificacion
+BEFORE UPDATE ON "receta"."receta"
+FOR EACH ROW
+EXECUTE FUNCTION receta_set_fecha_modificacion();

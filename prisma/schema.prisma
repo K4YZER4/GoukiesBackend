@@ -60,7 +60,7 @@ model Proveedor {
 // ============================================================
 
 model Unidad {
-  id              Int    @id
+  id              Int    @id @default(autoincrement())
   nombre          String @db.VarChar(30)
   cantidad_gramos Int?
 
@@ -72,7 +72,7 @@ model Unidad {
 }
 
 model Ingrediente {
-  id     Int    @id
+  id     Int    @id @default(autoincrement())
   nombre String @db.VarChar(50)
 
   productos Producto[]
@@ -82,7 +82,7 @@ model Ingrediente {
 }
 
 model Marca {
-  id     Int    @id
+  id     Int    @id @default(autoincrement())
   nombre String @db.VarChar(30)
 
   productos Producto[]
@@ -92,7 +92,7 @@ model Marca {
 }
 
 model Tag {
-  id     Int    @id
+  id     Int    @id @default(autoincrement())
   nombre String @db.VarChar(30)
 
   tags_receta TagReceta[]
@@ -102,7 +102,7 @@ model Tag {
 }
 
 model Tipo {
-  id     Int    @id
+  id     Int    @id @default(autoincrement())
   nombre String @db.VarChar(50)
 
   productos Producto[]
@@ -200,7 +200,6 @@ model ProductoProveedor {
   @@map("producto_proveedor")
   @@schema("receta")
 }
-
 model RecetaProducto {
   id_receta      String   @map("id_receta") @db.Uuid
   id_producto    String   @map("id_producto") @db.Uuid
@@ -229,7 +228,7 @@ model RecetaInsumo {
 }
 
 model RecetaPaso {
-  id        Int    @id
+  id        Int    @id @default(autoincrement())
   id_receta String @map("id_receta") @db.Uuid
   paso      String? @db.VarChar(300)
   orden     Int
@@ -257,7 +256,7 @@ model Entrada {
 }
 
 model DetalleEntrada {
-  id          Int     @id
+  id          Int     @id @default(autoincrement())
   id_producto String  @map("id_producto") @db.Uuid
   id_entrada  String  @map("id_entrada") @db.Uuid
   precio      Decimal @db.Decimal(10, 2)
@@ -285,7 +284,7 @@ model Salida {
 }
 
 model DetalleSalida {
-  id          Int    @id
+  id          Int    @id @default(autoincrement())
   id_salida   String @map("id_salida") @db.Uuid
   id_producto String @map("id_producto") @db.Uuid
   cantidad    Int

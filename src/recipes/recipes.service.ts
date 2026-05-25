@@ -1,32 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { CreateRecipeDto } from "./dto/creatRecipe.dto";
+import { CreateOrUpdateRecipeDto } from "./dto/createOrUpedateRecipe.dto";
 import { PrismaService } from "../prisma/prisma.service";
 import { Prisma } from "@prisma/client";
 import { NotFoundException, ConflictException } from "@nestjs/common/exceptions";
 import { deleteRecipeDto } from "./dto/deleteRecipe.dto";
-import { UpdateRecipeDto } from "./dto/updateRecipe.dto";
 @Injectable()
 export class RecipesService {
   constructor(private readonly prisma: PrismaService) {}
-  async update(id: string, dto: UpdateRecipeDto) {
-    if (!id) {
-      throw new NotFoundException("Receta no encontrada");
-    }
-    await this.prisma.db.receta.update({
-      where: { id: id },
-      data: {
-        nombre: dto.nombre,
-        profit: dto.profit,
-        porciones_totales: dto.porcionesTotales,
-        imagen_url: dto.imagenURL,
-        fecha_modificacion: new Date(),
-        descripcion: dto.descripcion,
-      },
-    });
-    return {
-      message: "Receta actualizada correctamente",
-    };
-  }
   async delete(dto: deleteRecipeDto) {
     if (!dto.id) {
       throw new NotFoundException("Receta no encontrada");
@@ -47,36 +27,59 @@ export class RecipesService {
       ingredientes: ingredientes.filter((i) => i.id_receta === receta.id),
     }));
   }
-  async create(dto: CreateRecipeDto) {
-    try {
-      const receta = await this.prisma.db.receta.create({
-        data: {
-          nombre: dto.nombre,
-          profit: dto.profit,
-          porciones_totales: dto.porcionesTotales,
-          imagen_url: dto.imagenURL,
-          fecha_modificacion: new Date(),
-          descripcion: dto.descripcion,
-          usuario: {
-            connect: { id: dto.idUsuario },
-          },
-        },
+  async createOrUpdate(dto: CreateOrUpdateRecipeDto, id?: string) {
+    return this.prisma.db.$transaction(async (tx) => {
+      // 1. Crear o actualizar la receta
+      const receta = id
+        ? await tx.receta.update({
+            where: { id },
+            data: {
+              nombre: dto.nombre,
+              descripcion: dto.descripcion,
+              profit: dto.profit,
+              porciones_totales: dto.porcionesTotales,
+              imagen_url: dto.imagenURL,
+            },
+          })
+        : await tx.receta.create({
+            data: {
+              nombre: dto.nombre,
+              descripcion: dto.descripcion,
+              profit: dto.profit,
+              porciones_totales: dto.porcionesTotales,
+              imagen_url: dto.imagenURL,
+              id_usuario: dto.idUsuario,
+            },
+          });
+
+      // 2. Pasos — borrar los viejos y crear los nuevos
+      await tx.recetaPaso.deleteMany({
+        where: { id_receta: receta.id },
       });
-      return receta;
-    } catch (e: any) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === "P2025") {
-          const causa = (e.meta?.cause as string) ?? "";
-          const modelo = causa.match(/'(\w+)' record/)?.[1] ?? "Relación";
-          throw new NotFoundException(`${modelo} no encontrado`);
-        }
-        if (e.code === "P2002") {
-          // Por si acaso hay un campo único duplicado
-          const campo = (e.meta?.target as string[])?.join(", ") ?? "campo";
-          throw new ConflictException(`El ${campo} ya existe`);
-        }
-      }
-      throw e;
-    }
+      await tx.recetaPaso.createMany({
+        data: dto.pasos.map((p) => ({
+          id_receta: receta.id,
+          orden: p.orden,
+          paso: p.paso,
+        })),
+      });
+
+      // 3. Ingredientes — borrar los viejos y crear los nuevos
+      await tx.recetaProducto.deleteMany({
+        where: { id_receta: receta.id },
+      });
+      await tx.recetaProducto.createMany({
+        data: dto.ingredientes.map((i) => ({
+          id_receta: receta.id,
+          id_producto: i.id_producto,
+          cantidad: i.cantidad,
+        })),
+      });
+
+      return {
+        message: id ? "Receta actualizada correctamente" : "Receta creada correctamente",
+        id: receta.id,
+      };
+    });
   }
 }
