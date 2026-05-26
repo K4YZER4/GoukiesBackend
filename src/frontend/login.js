@@ -28,8 +28,11 @@ formLogin.addEventListener("submit", async (e) => {
 
     // Suponiendo que el backend responde { access_token: '...' }
     localStorage.setItem("token", data.access_token);
-    mensajeLogin.textContent = "Login exitoso ✅ (token guardado)";
+    mensajeLogin.textContent = "Login exitoso ✅ (redireccionando...)";
     mensajeLogin.style.color = "#4ade80";
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 800);
   } catch (err) {
     console.error(err);
     mensajeLogin.textContent = "Error conectando con el servidor";
