@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { LoginDto } from "./dto/login";
-
+import * as bcrypt from "bcrypt";
 @Injectable()
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
@@ -15,10 +15,15 @@ export class AuthService {
       throw new UnauthorizedException("Usuario incorrecto");
     }
 
-    if (usuario.contrasena_hash !== dto.password) {
+    // ↓ CAMBIAR ESTO: usar bcrypt.compare en lugar de !==
+    const passwordValida = await bcrypt.compare(
+      dto.password, // lo que el usuario escribió
+      usuario.contrasena_hash // el hash guardado en BD
+    );
+
+    if (!passwordValida) {
       throw new UnauthorizedException("Contraseña incorrecta");
     }
-
-    return usuario;
+    return { mensaje: "Login exitoso" };
   }
 }

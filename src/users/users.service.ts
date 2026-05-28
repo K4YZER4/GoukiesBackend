@@ -2,6 +2,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/createUser";
 import { deleteUserDto } from "./dto/deleteUser.dto";
+import * as bcrypt from "bcrypt";
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -23,11 +24,15 @@ export class UsersService {
     if (existeNombre) {
       throw new UnauthorizedException("El nombre de usuario ya está en uso");
     }
+    if (dto.password.length < 4) {
+      throw new UnauthorizedException("La contraseña debe tener al menos 4 caracteres");
+    }
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
     const usuario = await this.prisma.db.usuario.create({
       data: {
         nombre: dto.nombre,
         correo_electronico: dto.correo_electronico,
-        contrasena_hash: dto.password,
+        contrasena_hash: hashedPassword,
         moneda: {
           // Nombre de la tabla
           connect: { codigo: dto.codigo_moneda }, // ← así se conecta una FK
