@@ -1,4 +1,11 @@
-import { Controller } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
+import { Controller, Post, Body } from "@nestjs/common";
+import { DashboardsService } from "./dashboards.service";
+import { PrincipalDashboardDto } from "./dto/principalDashboard.dto";
 @Controller("dashboards")
-export class DashboardsController {}
+export class DashboardsController {
+  constructor(private readonly dashboardsService: DashboardsService) {}
+  @Post("principalDashboard")
+  getPrincipalDashboardData(@Body() dto: PrincipalDashboardDto) {
+    return this.dashboardsService.getPrincipalDashboardData(dto);
+  }
+}
