@@ -7,9 +7,9 @@ import { UpdateIngredientDto } from "./dto/updateIngredient.dto";
 export class IngredientsController {
   constructor(private readonly ingredientsService: IngredientsService) {}
 
-  @Post("create")
+  @Post("createOrUpdate")
   create(@Body() dto: CreateIngredientDto) {
-    return this.ingredientsService.create(dto);
+    return this.ingredientsService.createOrUpdate(dto);
   }
 
   @Get("obtain-all")
@@ -20,8 +20,8 @@ export class IngredientsController {
   delete(@Body() dto: DeleteIngredientDto) {
     return this.ingredientsService.delete(dto);
   }
-  @Patch("update/:id")
-  update(@Param("id", ParseUUIDPipe) id: string, @Body() dto: UpdateIngredientDto) {
-    return this.ingredientsService.update(id, dto);
+  @Patch("createOrUpdate/:id_producto")
+  update(@Param("id_producto", ParseUUIDPipe) id: string, @Body() dto: CreateIngredientDto) {
+    return this.ingredientsService.createOrUpdate(dto, id);
   }
 }
